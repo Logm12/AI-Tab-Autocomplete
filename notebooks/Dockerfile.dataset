@@ -1,0 +1,5 @@
+# Minimal image chỉ chứa fim_dataset.jsonl
+FROM alpine:latest
+WORKDIR /data
+COPY phase2_training/fim_dataset.jsonl .
+CMD ["ls", "-la"]

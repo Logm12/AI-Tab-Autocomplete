@@ -1,0 +1,37 @@
+# Wheels only for Python 3.11
+FROM python:3.11-slim
+
+WORKDIR /wheels
+
+RUN pip install --upgrade pip
+
+# Download NumPy 1.26.4 for Python 3.11
+RUN pip download numpy==1.26.4 \
+    --python-version 3.11 \
+    --platform manylinux2014_x86_64 \
+    --only-binary=:all: -d .
+
+RUN pip download numpy==1.26.4 \
+    --python-version 3.11 \
+    --platform manylinux_2_17_x86_64 \
+    --only-binary=:all: -d . || true
+
+# Download other training dependencies for Python 3.11
+RUN pip download \
+    torch \
+    transformers \
+    accelerate \
+    peft \
+    bitsandbytes \
+    trl \
+    datasets \
+    huggingface_hub \
+    sentencepiece \
+    tqdm \
+    pandas \
+    python-Levenshtein \
+    --python-version 3.11 \
+    --platform manylinux2014_x86_64 \
+    --only-binary=:all: -d . || true
+
+CMD ["ls", "-la"]

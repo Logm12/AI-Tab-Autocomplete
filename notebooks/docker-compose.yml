@@ -1,0 +1,39 @@
+services:
+  # Inference only (lightweight, no GPU needed)
+  inference:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-autocomplete
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./phase3_optimization/gguf_model:/app/models:ro
+    environment:
+      - MODEL_PATH=/app/models/qwen2.5-coder-0.5b-q4_k_m.gguf
+    restart: unless-stopped
+
+  # Full training (GPU required)
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile.full
+    container_name: ai-autocomplete-training
+    ports:
+      - "8888:8888"
+      - "8001:8000"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./outputs:/app/outputs
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    profiles:
+      - training

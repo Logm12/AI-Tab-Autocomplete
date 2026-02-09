@@ -1,0 +1,73 @@
+# =====================================================
+# AI Auto-Complete - Training Package
+# Docker image for packaging files to offline machine
+# =====================================================
+
+FROM python:3.10-slim
+
+WORKDIR /package
+
+# Install pip tools for downloading wheels
+RUN pip install --upgrade pip
+
+# Create directory structure
+RUN mkdir -p wheels notebooks scripts
+
+# =====================================================
+# 1. Download wheels for offline installation
+# CRITICAL: NumPy 1.26.4 for PyTorch compatibility
+# =====================================================
+COPY requirements_training.txt .
+
+# Download NumPy 1.26.4 first
+RUN pip download -d wheels \
+    numpy==1.26.4 \
+    --python-version 3.10 \
+    --platform manylinux2014_x86_64 \
+    --only-binary=:all:
+
+# Download other training dependencies
+RUN pip download -d wheels \
+    torch>=2.1.0 \
+    transformers>=4.36.0 \
+    accelerate>=0.25.0 \
+    peft>=0.7.0 \
+    bitsandbytes>=0.41.0 \
+    trl>=0.7.0 \
+    datasets>=2.14.0 \
+    huggingface_hub>=0.19.0 \
+    sentencepiece>=0.1.99 \
+    gguf>=0.6.0 \
+    pandas>=2.0.0 \
+    tqdm>=4.65.0 \
+    python-Levenshtein \
+    --python-version 3.10 \
+    --platform manylinux2014_x86_64 \
+    --only-binary=:all: || true
+
+# Download remaining as source
+RUN pip download -d wheels -r requirements_training.txt --no-deps || true
+
+# =====================================================
+# 2. Copy Offline Training Notebooks
+# =====================================================
+COPY phase2_training/offline/01_data_preparation_offline.ipynb notebooks/
+COPY phase2_training/offline/02_training_offline.ipynb notebooks/
+COPY phase2_training/offline/03_evaluation_offline.ipynb notebooks/
+COPY phase2_training/offline/04_generate_dpo_data_offline.ipynb notebooks/
+COPY phase2_training/offline/05_train_dpo_offline.ipynb notebooks/
+
+# =====================================================
+# 3. Copy Dataset
+# =====================================================
+COPY phase2_training/fim_dataset.jsonl .
+
+# =====================================================
+# 4. Copy Scripts from Group_train
+# =====================================================
+COPY Group_train/phase2_training/train_offline.py scripts/
+COPY Group_train/phase3_optimization/evaluate_offline.py scripts/
+COPY Group_train/phase3_optimization/phase3_gguf_pipeline.py scripts/
+
+# Default command: show contents
+CMD ["sh", "-c", "echo '=== AI Auto-Complete Training Package ===' && ls -la && echo '' && echo 'Notebooks:' && ls -la notebooks/ && echo '' && echo 'Wheels:' && ls wheels/ | wc -l && echo 'wheel files'"]

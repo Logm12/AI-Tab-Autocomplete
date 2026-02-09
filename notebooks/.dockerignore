@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints
+
+# Large Models and Archives
+*.zip
+*.tar.gz
+*.bin
+*.pth
+*.gguf
+*.safetensors
+wandb/
+outputs/
+final_model/
+gguf_model/
+phase2_model.zip
+
+# Except the one we explicitly want if we copied it (but we excluded it in Dockerfile via specific Copy if we did, but here we cover Copy Group_train)
+# We want to exclude models inside Group_train too if they were missed by cleanup
+Group_train/**/phase2_model.zip
+Group_train/**/final_model
