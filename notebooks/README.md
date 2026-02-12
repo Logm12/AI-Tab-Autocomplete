@@ -2,10 +2,7 @@
 
 **Edge-optimized code completion system powered by Qwen2.5-Coder**
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-Run code completion locally on your CPU with low latency. This system eliminates the need for cloud dependencies, GPUs, or external API keys, ensuring your code remains private.
+Run code completion locally on local CPU with low latency. This system eliminates the need for cloud dependencies, GPUs, or external API keys, ensuring code remains private.
 
 ---
 
@@ -31,12 +28,17 @@ Run code completion locally on your CPU with low latency. This system eliminates
 
 ## Architecture
 
- The system follows a four-phase pipeline:
+The system follows a streamlined four-phase pipeline designed for efficiency and privacy:
 
 1.  **Data Engineering**: Collection, scrubbing, and transformation of training data (from BigCode The Stack).
 2.  **Model Training**: Fine-tuning Qwen2.5-Coder using QLoRA and DPO (Direct Preference Optimization).
 3.  **Optimization**: Merging adapters and converting/quantizing to GGUF format for edge deployment.
 4.  **Deployment**: Serving the model via a FastAPI server using `llama.cpp` for inference.
+The following diagram illustrates the complete workflow, from data processing to ensuring the model runs efficiently on consumer hardware.
+
+<div align="center">
+  <img src="assets/Viettel_data_pipeline.png" alt="System Architecture Diagram" width="100%">
+</div>
 
 ## Quick Start
 
@@ -141,6 +143,29 @@ models:
       maxPromptTokens: 1024
       transform: false
 ```
+
+## Offline Environment Setup
+
+For environments without internet access, you can pre-download all necessary Python packages (wheels) using the provided Docker configuration.
+
+1.  **Build the Downloader Image**:
+    ```bash
+    docker build -f Dockerfile.wheels -t offline-wheels .
+    ```
+
+2.  **Extract Wheels**:
+    Copy the downloaded packages from the container to your local machine:
+    ```bash
+    docker create --name temp-container offline-wheels
+    docker cp temp-container:/wheels ./offline_packages
+    docker rm temp-container
+    ```
+
+3.  **Install on Offline Machine**:
+    Transfer the `offline_packages` directory to your target machine and install:
+    ```bash
+    pip install --no-index --find-links=./offline_packages -r phase4_deployment/requirements.txt
+    ```
 
 ## License
 

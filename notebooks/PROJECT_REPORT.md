@@ -1,8 +1,7 @@
-# Edge-Optimized Code Completion System: Project Report
+# Project Report
 
 **Project Name**: AI Auto-Complete
 **Author**: Mac Pham Thien Long
-**Date**: 18/01/2026
 
 ---
 
@@ -63,6 +62,11 @@ The system consists of four distinct phases:
     -   FastAPI server using `llama-cpp-python` bindings.
     -   Implementation of efficient token healing and stop criteria.
     -   Integration with VS Code via the Continue extension.
+The following diagram illustrates the complete workflow, from data processing to ensuring the model runs efficiently on consumer hardware.
+
+<div align="center">
+  <img src="assets/Viettel_data_pipeline.png" alt="System Architecture Diagram" width="100%">
+</div>
 
 ### 3.2. Technology Stack
 
@@ -117,6 +121,3 @@ This solution offers a cost-effective, private alternative to commercial code as
 -   **Language Expansion**: Explicit training for additional languages like Rust and TypeScript.
 -   **Telemetry**: Collecting anonymous usage data to further refine the model.
 
----
-
-*Report generated on 18/01/2026*
